@@ -147,5 +147,3 @@ BusBar - Factory Type B(1)인 경우 PLC_WRITE_LOG_LEAD_POSITION 값이 1인 경우 Fron
 
 2020.02.12
 Case - Measure 결과 출력 부 높이 데이터 Min, Max, Average 출력 추가
-
-test
