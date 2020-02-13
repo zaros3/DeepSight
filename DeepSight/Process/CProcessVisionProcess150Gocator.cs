@@ -621,7 +621,9 @@ namespace DeepSight {
             // 검사인덱스
             int iInspectionIndex = pDocument.GetInspectionIndex();
             do {
-                try {
+                try
+                {
+                    objResult.objResultCommon.objVidiScore.Clear();
                     short[] sHeightDataOrigin = objResult.objResultCommon.obj3DDataHeightOrigin;        //센서에서 획득한 원본 3D Data(1차원 배열)
                     int[] iHeightDataOrigin = new int[ sHeightDataOrigin.Length ];                      //원본 3D Data를 short에서 int로 변환
                     byte[] byteIntensityOrigin = objResult.objResultCommon.obj3DDataIntensityOrigin;    //센서에서 획득한 원본 밝기 이미지
