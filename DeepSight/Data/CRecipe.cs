@@ -1,0 +1,249 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+namespace DeepSight
+{
+	public class CRecipe
+	{
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 생성자
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CRecipe()
+		{
+
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 소멸자
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		~CRecipe()
+		{
+
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 초기화
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public bool Initialize()
+		{
+			bool bReturn = false;
+
+			do {
+
+				bReturn = true;
+			} while( false );
+
+			return bReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 해제
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void Deinitialize()
+		{
+
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 해당 폴더 리스트 검색
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public List<string> GetDirectoryList( string strFilePath )
+		{
+			List<string> objReturn = new List<string>();
+
+			do {
+				DirectoryInfo objDir = new DirectoryInfo( strFilePath );
+				// 지정된 경로에 폴더 없으면 빠져나감
+				if( false == objDir.Exists ) break;
+				// 전체 검색
+				DirectoryInfo[] objDirArr = objDir.GetDirectories( "*", SearchOption.TopDirectoryOnly );
+				for( int iLoopDir = 0; iLoopDir < objDirArr.Length; iLoopDir++ ) {
+					objReturn.Add( objDirArr[ iLoopDir ].Name );
+				}
+
+			} while( false );
+
+			return objReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 폴더 복사
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetDirectoryCopy( string strExistFilePath, string strNewFilePath )
+		{
+			do {
+				DirectoryInfo objDir = new DirectoryInfo( strExistFilePath );
+				// 기존 폴더가 존재하지 않는 경우 넘어감
+				if( false == objDir.Exists ) break;
+				// 하위 폴더를 뽑아냄
+				DirectoryInfo[] objDirArray = objDir.GetDirectories();
+				// 새 폴더를 생성
+				if( false == Directory.Exists( strNewFilePath ) ) {
+					Directory.CreateDirectory( strNewFilePath );
+				}
+				// 파일 검색
+				FileInfo[] objFileArray = objDir.GetFiles();
+				for( int iLoopFile = 0; iLoopFile < objFileArray.Length; iLoopFile++ ) {
+					string strPath = Path.Combine( strNewFilePath, objFileArray[ iLoopFile ].Name );
+					objFileArray[ iLoopFile ].CopyTo( strPath, true );
+				}
+				// 하위 폴더도 적용
+				for( int iLoopSub = 0; iLoopSub < objDirArray.Length; iLoopSub++ ) {
+					string strPath = Path.Combine( strNewFilePath, objDirArray[ iLoopSub ].Name );
+					SetDirectoryCopy( objDirArray[ iLoopSub ].FullName, strPath );
+				}
+
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 폴더 삭제
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetDirectoryDelete( string strFilePath )
+		{
+			DirectoryInfo objDir = new DirectoryInfo( strFilePath );
+			// 하위 폴더까지 삭제
+			try {
+				objDir.Delete( true );
+			}
+			catch( IOException ex ) {
+				Trace.WriteLine( ex.StackTrace );
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 레시피 정보 리스트 받음
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public List<CConfig.CRecipeInformation> GetRecipeInformationList()
+		{
+			var pDocument = CDocument.GetDocument;
+			List<CConfig.CRecipeInformation> objRecipeInformationList = new List<CConfig.CRecipeInformation>();
+
+			List<string> objRecipeIDList = GetDirectoryList( pDocument.m_objConfig.GetRecipePath() );
+			// 해당 폴더 검색해서 레시피 파라미터 리스트를 뽑아냄
+			for( int iLoopRecipeIDList = 0; iLoopRecipeIDList < objRecipeIDList.Count; iLoopRecipeIDList++ ) {
+				string strPath = string.Format( @"{0}\{1}", pDocument.m_objConfig.GetRecipePath(), objRecipeIDList[ iLoopRecipeIDList ] );
+				if( false == Directory.Exists( strPath ) ) {
+					// 폴더 생성
+					Directory.CreateDirectory( strPath );
+				}
+				strPath = string.Format( @"{0}\{1}\{2}", pDocument.m_objConfig.GetRecipePath(), objRecipeIDList[ iLoopRecipeIDList ], CDefine.DEF_RECIPE_INI );
+				ClassINI objINI = new ClassINI( strPath );
+				string strSection = "RECIPE";
+
+				CConfig.CRecipeInformation objRecipeInformation = new CConfig.CRecipeInformation();
+				objRecipeInformation.strRecipeID = objINI.GetString( strSection, "strRecipeID", "" );
+				objRecipeInformation.strRecipeName = objINI.GetString( strSection, "strRecipeName", "" );
+				objRecipeInformationList.Add( objRecipeInformation );
+			}
+
+			return objRecipeInformationList;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 레시피 정보 리스트 받음
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CConfig.CRecipeInformation GetRecipeInformationList( string strRecipeID )
+		{
+			var pDocument = CDocument.GetDocument;
+
+			string strPath = string.Format( @"{0}\{1}", pDocument.m_objConfig.GetRecipePath(), strRecipeID );
+			if( false == Directory.Exists( strPath ) ) {
+				// 폴더 생성
+				Directory.CreateDirectory( strPath );
+			}
+			strPath = string.Format( @"{0}\{1}\{2}", pDocument.m_objConfig.GetRecipePath(), strRecipeID, CDefine.DEF_RECIPE_INI );
+			ClassINI objINI = new ClassINI( strPath );
+			string strSection = "RECIPE";
+
+			CConfig.CRecipeInformation objRecipeInformation = new CConfig.CRecipeInformation();
+			objRecipeInformation.strRecipeID = objINI.GetString( strSection, "strRecipeID", "" );
+			objRecipeInformation.strRecipeName = objINI.GetString( strSection, "strRecipeName", "" );
+
+			return objRecipeInformation;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 레시피 아이디가 중복되는지 체크
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public bool GetRecipeIDOverlap( string strRecipeID )
+		{
+			bool bReturn = false;
+
+			do {
+				var pDocument = CDocument.GetDocument;
+				List<string> objRecipeIDList = GetDirectoryList( pDocument.m_objConfig.GetRecipePath() );
+				// 해당 폴더 검색해서 레시피 파라미터 리스트를 뽑아냄
+				int iLoopRecipeIDList;
+				for( iLoopRecipeIDList = 0; iLoopRecipeIDList < objRecipeIDList.Count; iLoopRecipeIDList++ ) {
+					if( objRecipeIDList[ iLoopRecipeIDList ] == strRecipeID ) {
+						break;
+					}
+				}
+
+				if( iLoopRecipeIDList == objRecipeIDList.Count ) break;
+
+				bReturn = true;
+			} while( false );
+
+			return bReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 해당 레시피 폴더 내 레시피 아이디 변수 일치시킴
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetRecipeIDMatch( string strRecipeID, string strRecipeName )
+		{
+			var pDocument = CDocument.GetDocument;
+
+			string strPath = string.Format( @"{0}\{1}", pDocument.m_objConfig.GetRecipePath(), strRecipeID );
+			if( false == Directory.Exists( strPath ) ) {
+				// 폴더 생성
+				Directory.CreateDirectory( strPath );
+			}
+			strPath = string.Format( @"{0}\{1}\{2}", pDocument.m_objConfig.GetRecipePath(), strRecipeID, CDefine.DEF_RECIPE_INI );
+			ClassINI objINI = new ClassINI( strPath );
+			string strSection = "RECIPE";
+
+			objINI.WriteValue( strSection, "strRecipeID", strRecipeID );
+			objINI.WriteValue( strSection, "strRecipeName", strRecipeName );
+		}
+	}
+}

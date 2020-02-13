@@ -1,0 +1,657 @@
+﻿using Cognex.VisionPro;
+using Cognex.VisionPro.Caliper;
+using Cognex.VisionPro.Display;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace DeepSight
+{
+	public partial class CFormSetupVisionSettingSubFindLine : Form, CFormInterface
+	{
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//private
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// 메인 코그 디스플레이
+		private CogDisplay m_objCogDisplayMain;
+		// 파인드 라인 툴
+		private CogFindLineTool m_objFindLineTool;
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 생성자
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CFormSetupVisionSettingSubFindLine()
+		{
+			InitializeComponent();
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 폼 로드
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void CFormSetupVisionSettingSubFindLine_Load( object sender, EventArgs e )
+		{
+			// Initialize 함수보다 시점 늦음
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 폼 종료
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void CFormSetupVisionSettingSubFindLine_FormClosed( object sender, FormClosedEventArgs e )
+		{
+			// 해제
+			DeInitialize();
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 초기화
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public bool Initialize( CogDisplay objCogDisplay )
+		{
+			bool bReturn = false;
+
+			do {
+				// 메인 코그 디스플레이 연결
+				m_objCogDisplayMain = objCogDisplay;
+				// 초기화 언어 변경
+				SetChangeLanguage();
+				// 버튼 이벤트 로그 정의
+				SetButtonEventChange();
+				// 버튼 색상 정의
+				SetButtonColor();
+				// 타이머 외부에서 제어
+				timer.Interval = 100;
+				timer.Enabled = false;
+
+				bReturn = true;
+			} while( false );
+
+			return bReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 해제
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void DeInitialize()
+		{
+			cogDisplayRunImage.InteractiveGraphics.Dispose();
+			cogDisplayRunImage.Dispose();
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 버튼 색상 정의
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetButtonColor()
+		{
+			var pFormCommon = CFormCommon.GetFormCommon;
+			// 배경
+			this.BackColor = pFormCommon.COLOR_FORM_VIEW;
+			// 버튼 Fore, Back 색상 정의
+			pFormCommon.SetButtonColor( this.BtnTitleFindLineSetting, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_TITLE );
+			pFormCommon.SetButtonColor( this.BtnImageGrab, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnTitleNumber, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnNumber, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnTitleIgnoreNumber, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnIgnoreNumber, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnTitleContrastThreshold, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnContrastThreshold, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnTitleFilterHalfSizePixels, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnFilterHalfSizePixels, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnTitlePolarity, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnPolarity, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnSearchDirection, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+			pFormCommon.SetButtonColor( this.BtnRun, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 버튼 이벤트 로그 추가
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetButtonEventChange()
+		{
+			SetButtonEventChange( this.BtnImageGrab );
+			SetButtonEventChange( this.BtnNumber );
+			SetButtonEventChange( this.BtnIgnoreNumber );
+			SetButtonEventChange( this.BtnContrastThreshold );
+			SetButtonEventChange( this.BtnFilterHalfSizePixels );
+			SetButtonEventChange( this.BtnPolarity );
+			SetButtonEventChange( this.BtnSearchDirection );
+			SetButtonEventChange( this.BtnRun );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 기존 버튼 클릭 이벤트 지우고 시작 이벤트 -> 실제 클릭 이벤트 -> 종료 이벤트로 변경해줌
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetButtonEventChange( Control obj )
+		{
+			// 메서드 정보를 가져옴
+			MethodInfo objMethod = this.GetType().GetMethod( "get_Events", BindingFlags.NonPublic | BindingFlags.Instance );
+			// 메서드 정보와 인스턴스를 통해 이벤트 핸들러 목록을 가져옴
+			EventHandlerList objEventList = objMethod.Invoke( obj, new object[] { } ) as EventHandlerList;
+			// 해당 버튼 클래스에 Control Type을 가져옴
+			Type objControlType = GetControlType( obj.GetType() );
+			// 필드 정보를 가져옴
+			FieldInfo objFieldInfo = objControlType.GetField( "EventClick", BindingFlags.NonPublic | BindingFlags.Static );
+			// 필드 정보에서 해당 컨트롤을 지원하는 필드값을 가져옴
+			object objClickValue = objFieldInfo.GetValue( obj );
+			// 등록된 델리게이트 이벤트를 가져옴
+			Delegate delegateButtonClick = objEventList[ objClickValue ];
+			// 기존 클릭 이벤트를 지우고 시작 이벤트 -> 실 구현 이벤트 -> 종료 이벤트로 변경해줌
+			objEventList.RemoveHandler( objClickValue, delegateButtonClick );
+			objEventList.AddHandler( objClickValue, new EventHandler( SetButtonStartLog ) );
+			objEventList.AddHandler( objClickValue, delegateButtonClick );
+			objEventList.AddHandler( objClickValue, new EventHandler( SetButtonEndLog ) );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 시작 버튼 로그
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetButtonStartLog( object sender, EventArgs e )
+		{
+			var pDocument = CDocument.GetDocument;
+			pDocument.SetUpdateButtonLog( this, string.Format( "{0} : [ {1} ]", ( sender as Button ).Name, "TRUE" ) );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 종료 버튼 로그
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetButtonEndLog( object sender, EventArgs e )
+		{
+			var pDocument = CDocument.GetDocument;
+			pDocument.SetUpdateButtonLog( this, string.Format( "{0} : [ {1} ]", ( sender as Button ).Name, "FALSE" ) );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : Control Type 검색
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private Type GetControlType( Type objType )
+		{
+			Type objReturn = null;
+			// Type 이름 Control 재귀 함수로 검색
+			if( "Control" != objType.Name ) {
+				objReturn = GetControlType( objType.BaseType );
+			}
+			else {
+				objReturn = objType;
+			}
+			return objReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 폼 스타일 달라붙음
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetFormDockStyle( Form objForm, Panel objPanel )
+		{
+			objForm.Owner = this;
+			objForm.TopLevel = false;
+			objForm.Visible = true;
+			objForm.Dock = DockStyle.Fill;
+			objPanel.Controls.Add( objForm );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 언어 변경
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public bool SetChangeLanguage()
+		{
+			bool bReturn = false;
+
+			do {
+				SetControlChangeLanguage( this.BtnTitleFindLineSetting );
+				SetControlChangeLanguage( this.BtnImageGrab );
+				SetControlChangeLanguage( this.BtnTitleNumber );
+				SetControlChangeLanguage( this.BtnTitleIgnoreNumber );
+				SetControlChangeLanguage( this.BtnTitleContrastThreshold );
+				SetControlChangeLanguage( this.BtnTitleFilterHalfSizePixels );
+				SetControlChangeLanguage( this.BtnTitlePolarity );
+				SetControlChangeLanguage( this.BtnSearchDirection );
+				SetControlChangeLanguage( this.BtnRun );
+				// 팝업 메뉴 변경
+				var pDocument = CDocument.GetDocument;
+				pDocument.SetCogDisplayPopupMenuChangeLanguage( cogDisplayRunImage );
+
+				bReturn = true;
+			} while( false );
+
+			return bReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 언어 변경
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetControlChangeLanguage( Control obj )
+		{
+			var pDocument = CDocument.GetDocument;
+			obj.Text = pDocument.GetDatabaseUIText( obj.Name, this.Name );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 타이머 유무
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetTimer( bool bTimer )
+		{
+			timer.Enabled = bTimer;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : Visible 유무
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetVisible( bool bVisible )
+		{
+			this.Visible = bVisible;
+
+			if( true == bVisible ) {
+				// 해당 폼을 말단으로 설정
+				var pDocument = CDocument.GetDocument;
+				pDocument.GetMainFrame().SetCurrentForm( this );
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 레시피 저장
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 		public void SetSaveRecipe( HLVision.VisionLibrary.CVisionLibraryAbstract.CInitializeParameter objInitialize )
+// 		{
+// 			CVisionLibraryCogFindLine obj = new CVisionLibraryCogFindLine();
+// 			obj.HLInitialize( objInitialize );
+// 			obj.m_objFindLineTool = this.m_objFindLineTool;
+// 			obj.HLSaveRecipe( objInitialize.strRecipePath, objInitialize.strRecipeName );
+// 		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 툴 적용 ( 외부 -> 내부 )
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void SetTool( CogFindLineTool objFindLineTool )
+		{
+			m_objFindLineTool = objFindLineTool;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 툴 반환 ( 내부 -> 외부 )
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CogFindLineTool GetTool()
+		{
+			return m_objFindLineTool;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 이미지 유무 체크해서 메인 디스플레이에 이미지를 가져옴
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void SetMainImage()
+		{
+			do {
+				if( null == m_objFindLineTool.InputImage ) break;
+				// 이미지 null 체크 말고도.. 이미지 할당 유무 체크해야 함.
+				if( false == m_objFindLineTool.InputImage.Allocated ) break;
+
+				m_objCogDisplayMain.Image = m_objFindLineTool.InputImage;
+
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 툴 내 파인드 라인 그래픽 -> 현재 디스플레이에 표시
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void GetFindLine()
+		{
+			do {
+				// 디스플레이 초기화
+				m_objCogDisplayMain.Image = null;
+				// 이미지 유무 체크해서 메인 디스플레이에 이미지를 가져옴
+				SetMainImage();
+				// 디스플레이 클리어
+				m_objCogDisplayMain.StaticGraphics.Clear();
+				m_objCogDisplayMain.InteractiveGraphics.Clear();
+				// 이미지 유무 체크
+				if( null == m_objCogDisplayMain.Image ) break;
+				// 극성 방향
+				CogLineSegment objLineSegment;
+				// 캘리퍼 사각형's
+				CogGraphicCollection objRegions;
+				m_objFindLineTool.CurrentRecordEnable = CogFindLineCurrentRecordConstants.All;
+				ICogRecord objCogRecord = m_objFindLineTool.CreateCurrentRecord();
+				objLineSegment = ( CogLineSegment )objCogRecord.SubRecords[ "InputImage" ].SubRecords[ "ExpectedShapeSegment" ].Content;
+				objRegions = ( CogGraphicCollection )objCogRecord.SubRecords[ "InputImage" ].SubRecords[ "CaliperRegions" ].Content;
+				// 캘리퍼 선
+				objLineSegment.Color = CogColorConstants.Green;
+				m_objCogDisplayMain.InteractiveGraphics.Add( ( ICogGraphicInteractive )objLineSegment, "", false );
+				// 캘리퍼 상자
+				if( null != objRegions ) {
+					for( int iLoopCount = 0; iLoopCount < objRegions.Count; iLoopCount++ ) {
+						objRegions[ iLoopCount ].Color = CogColorConstants.Green;
+						m_objCogDisplayMain.InteractiveGraphics.Add( ( ICogGraphicInteractive )objRegions[ iLoopCount ], "", false );
+					}
+				}
+
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 실행 이미지 디스플레이 이미지 변경
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void UpdateDisplay( CogImage8Grey objImage )
+		{
+			do {
+				// 이미지 확인
+				if( null == objImage ) break;
+				// 기존 디스플레이 클리어
+				cogDisplayRunImage.StaticGraphics.Clear();
+				cogDisplayRunImage.Image = objImage;
+				
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 타이머
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void timer_Tick( object sender, EventArgs e )
+		{
+			var pFormCommon = CFormCommon.GetFormCommon;
+
+			do {
+				if( null == m_objFindLineTool.RunParams ) break;
+				// 검색할 캘리퍼 숫자
+				pFormCommon.SetButtonText( this.BtnNumber, string.Format( "{0}", m_objFindLineTool.RunParams.NumCalipers ) );
+				// 무시할 수
+				pFormCommon.SetButtonText( this.BtnIgnoreNumber, string.Format( "{0}", m_objFindLineTool.RunParams.NumToIgnore ) );
+				// 캘리퍼 극성
+				pFormCommon.SetButtonText( this.BtnPolarity, string.Format( "{0}", m_objFindLineTool.RunParams.CaliperRunParams.Edge0Polarity.ToString() ) );
+				// 대비 임계값
+				pFormCommon.SetButtonText( this.BtnContrastThreshold, string.Format( "{0}", ( int )m_objFindLineTool.RunParams.CaliperRunParams.ContrastThreshold ) );
+				// 필터 절반 크기 픽셀
+				pFormCommon.SetButtonText( this.BtnFilterHalfSizePixels, string.Format( "{0}", m_objFindLineTool.RunParams.CaliperRunParams.FilterHalfSizeInPixels ) );
+				
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 이미지 그랩
+		//설명 : 실행 디스플레이에 이미지를 메인 디스플레이에 복사함
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnImageGrab_Click( object sender, EventArgs e )
+		{
+			do {
+				if( null == cogDisplayRunImage.Image ) break;
+
+				m_objCogDisplayMain.Image = cogDisplayRunImage.Image;
+				m_objFindLineTool.InputImage = cogDisplayRunImage.Image as CogImage8Grey;
+				GetFindLine();
+
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 캘리퍼 수 선택
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnNumber_Click( object sender, EventArgs e )
+		{
+			FormKeyPad objKeyPad = new FormKeyPad( ( double )m_objFindLineTool.RunParams.NumCalipers );
+			if( System.Windows.Forms.DialogResult.OK == objKeyPad.ShowDialog() ) {
+				// 예외 처리 값은 2 > Value
+				if( 2 <= ( int )objKeyPad.m_dResultValue ) {
+					m_objFindLineTool.RunParams.NumCalipers = ( int )objKeyPad.m_dResultValue;
+					// 파인드 라인 그래픽 받아옴
+					GetFindLine();
+				}
+				else {
+					var pDocument = CDocument.GetDocument;
+					// 캘리퍼 수는 2 보다 작은 수를 설정할 수 없습니다.
+					pDocument.SetMessage( CDefine.enumAlarmType.ALARM_WARNING, 10100 );
+				}
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 캘리퍼 결과 무시할 수 선택
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnIgnoreNumber_Click( object sender, EventArgs e )
+		{
+			FormKeyPad objKeyPad = new FormKeyPad( ( int )m_objFindLineTool.RunParams.NumToIgnore );
+			if( System.Windows.Forms.DialogResult.OK == objKeyPad.ShowDialog() ) {
+				// 예외 처리 값은 0 > Value
+				if( 0 <= ( int )objKeyPad.m_dResultValue ) {
+					m_objFindLineTool.RunParams.NumToIgnore = ( int )objKeyPad.m_dResultValue;
+					// 파인드 라인 그래픽 받아옴
+					GetFindLine();
+				}
+				else {
+					var pDocument = CDocument.GetDocument;
+					// 캘리퍼 결과 무시할 수는 0 보다 작은 수를 설정할 수 없습니다.
+					pDocument.SetMessage( CDefine.enumAlarmType.ALARM_WARNING, 10101 );
+				}
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 캘리퍼 대비 임계값 선택
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnContrastThreshold_Click( object sender, EventArgs e )
+		{
+			FormKeyPad objKeyPad = new FormKeyPad( m_objFindLineTool.RunParams.CaliperRunParams.ContrastThreshold );
+			if( System.Windows.Forms.DialogResult.OK == objKeyPad.ShowDialog() ) {
+				// 예외 처리 값은 0 > Value
+				if( 0.0 <= objKeyPad.m_dResultValue ) {
+					int iValue = ( int )objKeyPad.m_dResultValue; // 버림
+					m_objFindLineTool.RunParams.CaliperRunParams.ContrastThreshold = ( double )iValue;
+				}
+				else {
+					var pDocument = CDocument.GetDocument;
+					// 대비 임계값은 0 보다 작은 수를 설정할 수 없습니다.
+					pDocument.SetMessage( CDefine.enumAlarmType.ALARM_WARNING, 10102 );
+				}
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 캘리퍼 대비 필터 절반 크기 픽셀 선택
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnFilterHalfSizePixels_Click( object sender, EventArgs e )
+		{
+			FormKeyPad objKeyPad = new FormKeyPad( ( double )m_objFindLineTool.RunParams.CaliperRunParams.FilterHalfSizeInPixels );
+			if( System.Windows.Forms.DialogResult.OK == objKeyPad.ShowDialog() ) {
+				// 예외 처리 값은 1 > Value
+				if( 1 <= ( int )objKeyPad.m_dResultValue ) {
+					m_objFindLineTool.RunParams.CaliperRunParams.FilterHalfSizeInPixels = ( int )objKeyPad.m_dResultValue;
+				}
+				else {
+					var pDocument = CDocument.GetDocument;
+					// 캘리퍼 대비 필터 절반 크기 픽셀 수는 1 보다 작은 수를 설정할 수 없습니다.
+					pDocument.SetMessage( CDefine.enumAlarmType.ALARM_WARNING, 10103 );
+				}
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 캘리퍼 극성 선택
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnPolarity_Click( object sender, EventArgs e )
+		{
+			switch( m_objFindLineTool.RunParams.CaliperRunParams.Edge0Polarity ) {
+				case CogCaliperPolarityConstants.DarkToLight:
+					m_objFindLineTool.RunParams.CaliperRunParams.Edge0Polarity = CogCaliperPolarityConstants.DontCare;
+					break;
+				case CogCaliperPolarityConstants.DontCare:
+					m_objFindLineTool.RunParams.CaliperRunParams.Edge0Polarity = CogCaliperPolarityConstants.LightToDark;
+					break;
+				case CogCaliperPolarityConstants.LightToDark:
+					m_objFindLineTool.RunParams.CaliperRunParams.Edge0Polarity = CogCaliperPolarityConstants.DarkToLight;
+					break;
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 캘리퍼 검색 방향 변경
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnSearchDirection_Click( object sender, EventArgs e )
+		{
+			m_objFindLineTool.RunParams.CaliperSearchDirection += Math.PI;
+			// 파인드 라인 그래픽 받아옴
+			GetFindLine();
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 라인 검색
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnRun_Click( object sender, EventArgs e )
+		{
+			do {
+// 				var pDocument = CDocument.GetDocument;
+// 				var pFormCommon = CFormCommon.GetFormCommon;
+// 				// 이미지 있는 경우에만
+// 				if( null == cogDisplayRunImage.Image ) break;
+// 				// 파인드 라인 런
+// 				CVisionLibraryCogFindLine objVisionLibrary = new CVisionLibraryCogFindLine();
+// 				objVisionLibrary.m_objFindLineTool = m_objFindLineTool;
+// 				CVisionLibraryCogFindLine.stInputData objInput = new CVisionLibraryCogFindLine.stInputData();
+// 				CVisionLibraryCogFindLine.stOutputData objOutput = new CVisionLibraryCogFindLine.stOutputData();
+// 				objInput.objCogImage = cogDisplayRunImage.Image as CogImage8Grey;
+// 				if( false == objVisionLibrary.HLRun( objInput, out objOutput ) ) {
+// 					pDocument.SetUpdateLog( CDefine.enumLogType.LOG_ETC, "CFormSetupVisionSettingSubFindLine BtnRun_Click HLRun Fail" );
+// 					break;
+// 				}
+// 				// 그래픽 클리어
+// 				cogDisplayRunImage.StaticGraphics.Clear();
+// 				// 아예 못 찾으면 빨강
+// 				if( null == objOutput.objFoundLineSegment ) {
+// 					pFormCommon.SetButtonBackColor( this.BtnRun, pFormCommon.LAMP_RED_OFF );
+// 				}
+// 				else {
+// 					pFormCommon.SetButtonBackColor( this.BtnRun, pFormCommon.LAMP_GREEN_ON );
+// 				}
+// 				// 캘리퍼 결과 이미지에 표시
+// 				if( null != objOutput.objFoundLineSegment ) {
+// 					cogDisplayRunImage.StaticGraphics.Add( objOutput.objFoundLineSegment, "" );
+// 				}
+// 				if( null != objOutput.objFindLineResults ) {
+// 					for( int iLoopCount = 0; iLoopCount < objOutput.objFindLineResults.Count; iLoopCount++ ) {
+// 						cogDisplayRunImage.StaticGraphics.Add( objOutput.objFindLineResults[ iLoopCount ].CreateResultGraphics( CogFindLineResultGraphicConstants.DataPoint | CogFindLineResultGraphicConstants.TipText ), "" );
+// 					}
+// 				}
+				
+			} while( false );
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : ocx
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void BtnTitleFindLineSetting_Click( object sender, EventArgs e )
+		{
+            var pDocument = CDocument.GetDocument;
+
+            do {
+                CUserInformation objUserInformation = pDocument.GetUserInformation();
+                // 마스터만 가능하도록
+                if( CDefine.enumUserAuthorityLevel.USER_AUTHORITY_LEVEL_MASTER != objUserInformation.m_eAuthorityLevel ) break;
+
+                // ocx 넣기 전에 이미지 변경해줌
+                CogImage8Grey objOriginImage = m_objFindLineTool.InputImage;
+                m_objFindLineTool.InputImage = cogDisplayRunImage.Image as CogImage8Grey;
+                CDialogCogFindLine obj = new CDialogCogFindLine( m_objFindLineTool );
+                obj.ShowDialog();
+                // 빠져나오면서 원본 이미지 집어넣음
+                m_objFindLineTool.InputImage = objOriginImage;
+
+            } while( false );
+        }
+	}
+}

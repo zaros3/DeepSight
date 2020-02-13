@@ -1,0 +1,307 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Data.SQLite;
+using System.Diagnostics;
+using System.IO;
+
+namespace DeepSight
+{
+	/// <summary>
+	/// SQLite.dll을 직접 연결하는 인터페이스 클래스
+	/// </summary>
+	public class CSQLite
+	{
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// member variable
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// SQLite 접속 객체
+		/// </summary>
+		private SQLiteConnection m_objSQLiteConnection;
+		/// <summary>
+		/// SQLite 쿼리 날리는 객체
+		/// </summary>
+		private SQLiteCommand m_objSQLiteCommand;
+		/// <summary>
+		/// sql 접속하기 위한 명령
+		/// </summary>
+		private string m_strConnection;
+		/// <summary>
+		/// sql 접속하려는 데이터베이스 경로
+		/// </summary>
+		private string _strDatabasePath;
+		public string m_strDatabasePath
+		{
+			get
+			{
+				return _strDatabasePath;
+			}
+		}
+		/// <summary>
+		/// sql 접속하려는 데이터베이스 이름
+		/// </summary>
+		private string _strDatabaseName;
+		public string m_strDatabaseName
+		{
+			get
+			{
+				return _strDatabaseName;
+			}
+		}
+		/// <summary>
+		/// Query 날라오면 콜백 처리
+		/// </summary>
+		/// <param name="strQuery">쿼리문</param>
+		public delegate void CallBackQueryMessage( string strQuery );
+		private CallBackQueryMessage _callBackQueryMessage;
+		public void SetCallBackQueryMessage( CallBackQueryMessage callBack )
+		{
+			_callBackQueryMessage = callBack;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 초기화
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CErrorReturn HLInitialize( string strDatabaseFullPath )
+		{
+			CErrorReturn objReturn = new CErrorReturn( "CSQLite", "HLInitialize" );
+
+			do {
+				// 이름 제외한 폴더 경로
+				string strDatabasePathOnly = Path.GetDirectoryName( strDatabaseFullPath );
+				// 파일 이름 (확장자를 포함)
+				string strDatabaseExtendName = Path.GetFileName( strDatabaseFullPath );
+				// 확장자를 제거한 파일 이름
+				string strDatabaseName = Path.GetFileNameWithoutExtension( strDatabaseFullPath );
+				// 데이터베이스 경로랑 이름만
+				_strDatabasePath = strDatabasePathOnly;
+				_strDatabaseName = strDatabaseName;
+				// 데이퍼베이스 폴더 유무 체크
+				if( false == Directory.Exists( strDatabasePathOnly ) ) {
+					// 폴더가 없으면 생성
+					Directory.CreateDirectory( strDatabasePathOnly );
+				}
+				// 데이터베이스 파일 유무 체크
+				if( false == File.Exists( strDatabaseFullPath ) ) {
+					// db3 생성
+					SQLiteConnection.CreateFile( strDatabaseFullPath );
+				}
+				// 확장자 포함해서 연결
+				m_strConnection = string.Format( @"Data Source={0}\{1}", m_strDatabasePath, strDatabaseExtendName );
+
+				objReturn.m_bError = false;
+			} while( false );
+
+			return objReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 해제
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void HLDeInitialize()
+		{
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 연결
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CErrorReturn HLConnect()
+		{
+			CErrorReturn objReturn = new CErrorReturn( "CSQLite", "HLConnect" );
+
+			do {
+				try {
+					m_objSQLiteConnection = new SQLiteConnection( m_strConnection );
+					m_objSQLiteCommand = new SQLiteCommand();
+					// 연결된 데이터베이스랑 커맨드 1:1 매칭
+					m_objSQLiteCommand.Connection = m_objSQLiteConnection;
+					// 이벤트 등록
+					m_objSQLiteConnection.Commit += new SQLiteCommitHandler( OnEventCommit );
+					m_objSQLiteConnection.RollBack += new EventHandler( OnEventRollback );
+					// sql 통신 열어줌
+					m_objSQLiteConnection.Open();
+				}
+				catch( Exception ex ) {
+					Trace.WriteLine( ex.Message );
+					objReturn.m_strErrorMessage = ex.Message;
+					break;
+				}
+
+				objReturn.m_bError = false;
+			} while( false );
+
+			return objReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 연결 해제
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void HLDisconnect()
+		{
+			// sql 통신 닫아줌
+			m_objSQLiteConnection.Close();
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 실행( Insert, Update, Delete )
+		//설명 : strQueryList : 데이터베이스에 실행할 쿼리 리스트 트랜잭션 이용하여 속도 향상
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public SQLiteTransaction HLBeginTransaction()
+		{
+			SQLiteTransaction objTransaction = null;
+
+			try {
+				// 트랜잭션 시작
+				objTransaction = m_objSQLiteConnection.BeginTransaction();
+				//Trace.WriteLine( System.DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" ) + " Begin Transaction " );
+			}
+			catch( Exception ex ) {
+				Trace.WriteLine( ex.Message );
+			}
+
+			return objTransaction;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 실행( Insert, Update, Delete )
+		//설명 : strQueryList : 데이터베이스에 실행할 쿼리 리스트 트랜잭션 이용하여 속도 향상
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void HLCommit( SQLiteTransaction objSQLiteTransaction )
+		{
+			try {
+				// 트랜잭션 COMMIT
+				objSQLiteTransaction.Commit();
+				//Trace.WriteLine( System.DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" ) + " Transaction Commit" );
+			}
+			catch( Exception ex ) {
+				Trace.WriteLine( ex.Message );
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 실행( Insert, Update, Delete )
+		//설명 : strQueryList : 데이터베이스에 실행할 쿼리 리스트 트랜잭션 이용하여 속도 향상
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public void HLRollback( SQLiteTransaction objSQLiteTransaction )
+		{
+			try {
+				// 트랜잭션 ROLLBACK
+				objSQLiteTransaction.Rollback();
+				//Trace.WriteLine( System.DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" ) + " Transaction Rollback" );
+			}
+			catch( Exception ex ) {
+				Trace.WriteLine( ex.Message );
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 실행( Insert, Update, Delete )
+		//설명 : strQuery : 데이터베이스에 실행할 쿼리
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CErrorReturn HLExecute( string strQuery )
+		{
+			CErrorReturn objReturn = new CErrorReturn( "CSQLite", "HLExecute" );
+
+			do {
+				try {
+					// sql 쿼리문 넣어줌
+					m_objSQLiteCommand.CommandText = strQuery;
+					// 쿼리문 Trace
+					//Trace.WriteLine( System.DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" ) + " Query : " + strQuery );
+					// 콜백 호출
+					if( null != _callBackQueryMessage ) {
+						_callBackQueryMessage( strQuery );
+					}
+					// 연결에 대한 Transact-SQL 문을 실행하고 영향을 받는 행의 수를 반환합니다.
+					m_objSQLiteCommand.ExecuteNonQuery();
+				}
+				catch( Exception ex ) {
+					Trace.WriteLine( ex.Message );
+					objReturn.m_strErrorMessage = ex.Message;
+					break;
+				}
+
+				objReturn.m_bError = false;
+			} while( false );
+
+			return objReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 데이터베이스 데이터 불러오기( Select )
+		//설명 : strQuery : 데이터베이스에 실행할 쿼리 / objDataTable : 메모리 내 데이터의 한 테이블
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		public CErrorReturn HLReload( string strQuery, ref DataTable objDataTable )
+		{
+			CErrorReturn objReturn = new CErrorReturn( "CSQLite", "HLReload" );
+
+			do {
+				try {
+					SQLiteDataAdapter objSQLiteDataAdapter = new SQLiteDataAdapter( strQuery, m_strConnection );
+					// 쿼리문 Trace
+					//Trace.WriteLine( System.DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" ) + " Query : " + strQuery );
+					// 콜백 호출
+					if( null != _callBackQueryMessage ) {
+						_callBackQueryMessage( strQuery );
+					}
+					// 이름을 사용하여 지정된 범위에서 데이터 소스의 행과 일치하도록 행을 추가하거나 새로 고칩니다.
+					objSQLiteDataAdapter.Fill( objDataTable );
+				}
+				catch( Exception ex ) {
+					Trace.WriteLine( ex.Message );
+					objReturn.m_strErrorMessage = ex.Message;
+					break;
+				}
+
+				objReturn.m_bError = false;
+			} while( false );
+
+			return objReturn;
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 트랜잭션 완료 이벤트
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void OnEventCommit( object objSender, EventArgs e )
+		{
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//생성 : 
+		//추가 : 
+		//목적 : 트랜잭션 회복 이벤트
+		//설명 : 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		private void OnEventRollback( object objSender, EventArgs e )
+		{
+		}
+	}
+}

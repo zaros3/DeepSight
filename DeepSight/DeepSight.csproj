@@ -1,0 +1,894 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9A32A917-24FF-4A9F-9F83-C7B2D1BB3D5D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DeepSight</RootNamespace>
+    <AssemblyName>DeepSight</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>게시\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Camera.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cognex.VisionPro, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Blob, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Blob.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.CalibFix, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.CalibFix.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Caliper, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Caliper.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.CNLSearch, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.CNLSearch.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Comm, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Comm.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Core, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.CorePlus, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Dimensioning, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Dimensioning.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.Display.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.ImageFile, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.ImageFile.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.ImageProcessing, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.ImageProcessing.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.LineMax, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.LineMax.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.PMAlign, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.PMAlign.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.ToolGroup, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro.ToolGroup.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro3D.Display.Controls, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cognex.VisionPro3D.Graphic, Version=69.0.0.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Crevis.VirtualFG40Library, Version=4.4.6820.30340, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\Crevis.VirtualFG40Library.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GoSdkNet, Version=1.0.7121.18576, Culture=neutral, PublicKeyToken=3e18828f1dab5c8c, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\GoSdkNet.dll</HintPath>
+    </Reference>
+    <Reference Include="HLDeviceAlign, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\HLDeviceAlign.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HLDeviceIOVirtual, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\HLDeviceIOVirtual.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HLDeviceLightControllerLLight, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\HLDeviceLightControllerLLight.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HLDeviceLightControllerLVS, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\HLDeviceLightControllerLVS.dll</HintPath>
+    </Reference>
+    <Reference Include="HLDeviceMCProtocol, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\HLDeviceMCProtocol.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="kApiNet, Version=1.0.7118.9369, Culture=neutral, PublicKeyToken=aed51b4e56ae495f, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\kApiNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="netchartdir, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\netchartdir.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\OpenCvSharp.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\OpenCvSharp.UserInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="PylonC.NET, Version=4.2.0.0, Culture=neutral, PublicKeyToken=a77e8471c5919d5a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\PylonC.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="PylonC.NETSupportLibrary">
+      <HintPath>bin\Debug\PylonC.NETSupportLibrary.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\System.Data.SQLite.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Instrumentation" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="ViDi.NET, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.Base, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.Base.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.Common, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.Extensions, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.Interfaces, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.Local, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.Local.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.Logging, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.UI, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.UI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ViDi.NET.UI.Interfaces, Version=3.3.0.13030, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\ViDi.NET.UI.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="VisionLibrary, Version=1.0.1.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\x64\Debug\VisionLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CDefine.cs" />
+    <Compile Include="CDialogResultMonitor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogResultMonitor.Designer.cs">
+      <DependentUpon>CDialogResultMonitor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogChartHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogChartHistory.Designer.cs">
+      <DependentUpon>CDialogChartHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogFindLineSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogFindLineSetting.Designer.cs">
+      <DependentUpon>CDialogFindLineSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormReportProcess150.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormReportProcess150.Designer.cs">
+      <DependentUpon>CFormReportProcess150.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormReportProcess110.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormReportProcess110.Designer.cs">
+      <DependentUpon>CFormReportProcess110.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormResourceInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormResourceInfo.Designer.cs">
+      <DependentUpon>CFormResourceInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogResult.Designer.cs">
+      <DependentUpon>CDialogResult.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogChart.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogChart.Designer.cs">
+      <DependentUpon>CDialogChart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogChangeLogInPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogChangeLogInPassword.Designer.cs">
+      <DependentUpon>CDialogChangeLogInPassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogCogCreateLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogCogCreateLine.designer.cs">
+      <DependentUpon>CDialogCogCreateLine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogCogFindLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogCogFindLine.designer.cs">
+      <DependentUpon>CDialogCogFindLine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogCogLineMax.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogCogLineMax.designer.cs">
+      <DependentUpon>CDialogCogLineMax.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogCogPMAlign.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogCogPMAlign.designer.cs">
+      <DependentUpon>CDialogCogPMAlign.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogCogPMAlignImageMask.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogCogPMAlignImageMask.designer.cs">
+      <DependentUpon>CDialogCogPMAlignImageMask.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogEnumerate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogEnumerate.Designer.cs">
+      <DependentUpon>CDialogEnumerate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogLogin.designer.cs">
+      <DependentUpon>CDialogLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogMessage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogMessage.designer.cs">
+      <DependentUpon>CDialogMessage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CDialogWait.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CDialogWait.designer.cs">
+      <DependentUpon>CDialogWait.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormCommon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormCommon.Designer.cs">
+      <DependentUpon>CFormCommon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormDisplayChangeSize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormDisplayChangeSize.designer.cs">
+      <DependentUpon>CFormDisplayChangeSize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormMainProcess110.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormMainProcess110.designer.cs">
+      <DependentUpon>CFormMainProcess110.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormMainProcess150Gocator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormMainProcess150Gocator.designer.cs">
+      <DependentUpon>CFormMainProcess150Gocator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormMainProcess150.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormMainProcess150.designer.cs">
+      <DependentUpon>CFormMainProcess150.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormMainProcess60.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormMainProcess60.designer.cs">
+      <DependentUpon>CFormMainProcess60.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormReport.Designer.cs">
+      <DependentUpon>CFormReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormReportProcess60.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormReportProcess60.Designer.cs">
+      <DependentUpon>CFormReportProcess60.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormCommunication.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormCommunication.Designer.cs">
+      <DependentUpon>CFormCommunication.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormCommunicationIO.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormCommunicationIO.Designer.cs">
+      <DependentUpon>CFormCommunicationIO.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormCommunicationPLC.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormCommunicationPLC.Designer.cs">
+      <DependentUpon>CFormCommunicationPLC.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetupVisionGocator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetupVisionGocator.Designer.cs">
+      <DependentUpon>CFormSetupVisionGocator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetupVision.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetupVision.Designer.cs">
+      <DependentUpon>CFormSetupVision.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetupCamera.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetupCamera.Designer.cs">
+      <DependentUpon>CFormSetupCamera.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetupVisionSettingSubCreateLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetupVisionSettingSubCreateLine.designer.cs">
+      <DependentUpon>CFormSetupVisionSettingSubCreateLine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetupVisionSettingSubFindLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetupVisionSettingSubFindLine.designer.cs">
+      <DependentUpon>CFormSetupVisionSettingSubFindLine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetupVisionSettingSubPMAlign.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetupVisionSettingSubPMAlign.designer.cs">
+      <DependentUpon>CFormSetupVisionSettingSubPMAlign.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Database\CDatabaseImplementAbstract.cs" />
+    <Compile Include="Database\CDatabaseImplementHistory.cs" />
+    <Compile Include="Database\CDatabaseSendMessage.cs" />
+    <Compile Include="Database\CProcessDatabaseHistory.cs" />
+    <Compile Include="Database\CProcessDatabaseHistoryDelete.cs" />
+    <Compile Include="Data\AEC256.cs" />
+    <Compile Include="Data\CConfigValue.cs" />
+    <Compile Include="Data\CInspectionResult.cs" />
+    <Compile Include="Database\CCryptography.cs" />
+    <Compile Include="Database\CCsvFile.cs" />
+    <Compile Include="Database\CDatabaseAbstract.cs" />
+    <Compile Include="Database\CDatabaseDefine.cs" />
+    <Compile Include="Database\CErrorReturn.cs" />
+    <Compile Include="Database\CManagerTable.cs" />
+    <Compile Include="Database\CProcessDatabase.cs" />
+    <Compile Include="Database\CProcessDatabaseInformation.cs" />
+    <Compile Include="Database\CSchemaInformation.cs" />
+    <Compile Include="Database\CSQLite.cs" />
+    <Compile Include="Database\CTxtFile.cs" />
+    <Compile Include="Data\CConfig.cs" />
+    <Compile Include="Data\CInterfacePLC.cs" />
+    <Compile Include="Data\ClassINI.cs" />
+    <Compile Include="Data\CRecipe.cs" />
+    <Compile Include="Data\CDocument.cs" />
+    <Compile Include="CFormConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormConfig.Designer.cs">
+      <DependentUpon>CFormConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormConfigOption.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormConfigOption.Designer.cs">
+      <DependentUpon>CFormConfigOption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormConfigRecipe.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormConfigRecipe.Designer.cs">
+      <DependentUpon>CFormConfigRecipe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormInterface.cs" />
+    <Compile Include="CFormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormMain.designer.cs">
+      <DependentUpon>CFormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormSetup.Designer.cs">
+      <DependentUpon>CFormSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormTitle.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormTitle.designer.cs">
+      <DependentUpon>CFormTitle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormMenu.designer.cs">
+      <DependentUpon>CFormMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CFormView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormView.designer.cs">
+      <DependentUpon>CFormView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CMainFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CMainFrame.Designer.cs">
+      <DependentUpon>CMainFrame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\CUserInformation.cs" />
+    <Compile Include="Data\CVisionLibraryCollection.cs" />
+    <Compile Include="Data\Mmf\CMMFVisionDataDefine.cs" />
+    <Compile Include="Data\Mmf\CMMFManagerVisionData.cs" />
+    <Compile Include="Data\Mmf\CMMFPagesVisionData.cs" />
+    <Compile Include="Device\Camera\CDeviceCameraAbstract.cs" />
+    <Compile Include="Device\Camera\CDeviceCamera.cs" />
+    <Compile Include="Device\Camera\CDeviceCameraBasler.cs" />
+    <Compile Include="Device\Camera\CDeviceCameraGocator.cs" />
+    <Compile Include="Device\Camera\CDeviceCameraImageProviderBasler.cs" />
+    <Compile Include="Device\Camera\CDeviceCameraVirtualGocator.cs" />
+    <Compile Include="Device\Camera\CDeviceCameraVirtual.cs" />
+    <Compile Include="Device\CHART\PositionList.cs" />
+    <Compile Include="Device\CHART\threedscatter2.cs" />
+    <Compile Include="Device\CHART\DemoModule.cs" />
+    <Compile Include="Device\IO\CDeviceIO.cs" />
+    <Compile Include="Device\IO\CDeviceIOAbstract.cs" />
+    <Compile Include="Device\IO\CDeviceIOVirtual.cs" />
+    <Compile Include="Device\LightController\CDeviceLightController.cs" />
+    <Compile Include="Device\LightController\CDeviceLightControllerAbstract.cs" />
+    <Compile Include="Device\LightController\CDeviceLightControllerLVS.cs" />
+    <Compile Include="Device\LightController\CDeviceLightControllerLLight.cs" />
+    <Compile Include="Device\LightController\CDeviceLightControllerVirtual.cs" />
+    <Compile Include="Device\Math\CProcessLinearFitting.cs" />
+    <Compile Include="Device\Math\LUDecomposition.cs" />
+    <Compile Include="Device\Math\Matrix.cs" />
+    <Compile Include="Device\Math\PolyFit.cs" />
+    <Compile Include="Device\Measure_Hive\BusbarDll.cs" />
+    <Compile Include="Device\Measure_Hive\CMeasureManager.cs" />
+    <Compile Include="Device\Measure_Hive\CoverWeldingDll.cs" />
+    <Compile Include="Device\PLC\CDevicePLC.cs" />
+    <Compile Include="Device\PLC\CDevicePLCAbstract.cs" />
+    <Compile Include="Device\PLC\CDevicePLCMCProtocol.cs" />
+    <Compile Include="Device\PLC\CDevicePLCVirtual.cs" />
+    <Compile Include="CFormDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CFormDisplay.designer.cs">
+      <DependentUpon>CFormDisplay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Device\PMS\CPMSManager.cs" />
+    <Compile Include="Device\PMS\PMSMixedModeSharp.cs" />
+    <Compile Include="Device\PMS\PMSThread.cs" />
+    <Compile Include="Device\PMS\PMSThreadData.cs" />
+    <Compile Include="Device\PMS\PMSThreadManager.cs" />
+    <Compile Include="Device\VIDI\CVidiClass.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibrary.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryAbstract.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryCalibration.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryCogFixture.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryCogBlob.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryCogFindLine.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryCogFindLineIntersect.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryCogPMAlign.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryImageProcess.cs" />
+    <Compile Include="Device\VISION LABRARY\CVisionLibraryToolVirtual.cs" />
+    <Compile Include="FormKeyBoard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormKeyBoard.designer.cs">
+      <DependentUpon>FormKeyBoard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormKeyPad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormKeyPad.designer.cs">
+      <DependentUpon>FormKeyPad.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\CLogin.cs" />
+    <Compile Include="Process\CProcessMain.cs" />
+    <Compile Include="Process\CProcessMonitorLog.cs" />
+    <Compile Include="Process\CProcessSimulationTrigger.cs" />
+    <Compile Include="Process\CProcessVisionManagerProcess110.cs" />
+    <Compile Include="Process\CProcessVisionManagerProcess150Gocator.cs" />
+    <Compile Include="Process\CProcessVisionManagerProcess150.cs" />
+    <Compile Include="Process\CProcessVisionProcess110.cs" />
+    <Compile Include="Process\CProcessVisionProcess150Gocator.cs" />
+    <Compile Include="Process\CProcessVisionProcess150.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Process\CProcessAbstract.cs" />
+    <Compile Include="Process\CProcessVisionProcess60.cs" />
+    <Compile Include="Process\CProcessVisionManagerProcess60.cs" />
+    <Compile Include="Process\CProcessVision.cs" />
+    <Compile Include="SplashWindow\CDialogLoadingWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SplashWindow\CDialogLoadingWindow.Designer.cs">
+      <DependentUpon>CDialogLoadingWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SplashWindow\CLoadingScreen.cs" />
+    <EmbeddedResource Include="CDialogResultMonitor.resx">
+      <DependentUpon>CDialogResultMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogChartHistory.resx">
+      <DependentUpon>CDialogChartHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogFindLineSetting.resx">
+      <DependentUpon>CDialogFindLineSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormReportProcess150.resx">
+      <DependentUpon>CFormReportProcess150.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormReportProcess110.resx">
+      <DependentUpon>CFormReportProcess110.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormResourceInfo.resx">
+      <DependentUpon>CFormResourceInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogResult.resx">
+      <DependentUpon>CDialogResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogChart.resx">
+      <DependentUpon>CDialogChart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogChangeLogInPassword.resx">
+      <DependentUpon>CDialogChangeLogInPassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogCogCreateLine.resx">
+      <DependentUpon>CDialogCogCreateLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogCogFindLine.resx">
+      <DependentUpon>CDialogCogFindLine.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogCogLineMax.resx">
+      <DependentUpon>CDialogCogLineMax.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogCogPMAlign.resx">
+      <DependentUpon>CDialogCogPMAlign.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogCogPMAlignImageMask.resx">
+      <DependentUpon>CDialogCogPMAlignImageMask.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogEnumerate.resx">
+      <DependentUpon>CDialogEnumerate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogLogin.resx">
+      <DependentUpon>CDialogLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogMessage.resx">
+      <DependentUpon>CDialogMessage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CDialogWait.resx">
+      <DependentUpon>CDialogWait.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormCommon.resx">
+      <DependentUpon>CFormCommon.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormConfig.resx">
+      <DependentUpon>CFormConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormConfigOption.resx">
+      <DependentUpon>CFormConfigOption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormConfigRecipe.resx">
+      <DependentUpon>CFormConfigRecipe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormDisplayChangeSize.resx">
+      <DependentUpon>CFormDisplayChangeSize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormMainProcess110.resx">
+      <DependentUpon>CFormMainProcess110.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormMainProcess150Gocator.resx">
+      <DependentUpon>CFormMainProcess150Gocator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormMainProcess150.resx">
+      <DependentUpon>CFormMainProcess150.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormMainProcess60.resx">
+      <DependentUpon>CFormMainProcess60.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormReport.resx">
+      <DependentUpon>CFormReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormReportProcess60.resx">
+      <DependentUpon>CFormReportProcess60.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormMain.resx">
+      <DependentUpon>CFormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormCommunication.resx">
+      <DependentUpon>CFormCommunication.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetup.resx">
+      <DependentUpon>CFormSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormCommunicationIO.resx">
+      <DependentUpon>CFormCommunicationIO.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormCommunicationPLC.resx">
+      <DependentUpon>CFormCommunicationPLC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetupVisionGocator.resx">
+      <DependentUpon>CFormSetupVisionGocator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetupVision.resx">
+      <DependentUpon>CFormSetupVision.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetupCamera.resx">
+      <DependentUpon>CFormSetupCamera.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetupVisionSettingSubCreateLine.resx">
+      <DependentUpon>CFormSetupVisionSettingSubCreateLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetupVisionSettingSubFindLine.resx">
+      <DependentUpon>CFormSetupVisionSettingSubFindLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormSetupVisionSettingSubPMAlign.resx">
+      <DependentUpon>CFormSetupVisionSettingSubPMAlign.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormTitle.resx">
+      <DependentUpon>CFormTitle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormMenu.resx">
+      <DependentUpon>CFormMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormView.resx">
+      <DependentUpon>CFormView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CMainFrame.resx">
+      <DependentUpon>CMainFrame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CFormDisplay.resx">
+      <DependentUpon>CFormDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormKeyBoard.resx">
+      <DependentUpon>FormKeyBoard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormKeyPad.resx">
+      <DependentUpon>FormKeyPad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="SplashWindow\CDialogLoadingWindow.resx">
+      <DependentUpon>CDialogLoadingWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SMDLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TitleRun.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5%28x86 및 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Camera.ico" />
+    <Content Include="History.txt" />
+    <Content Include="Resources\SK.png" />
+    <None Include="Resources\SK_Innovation.PNG" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
