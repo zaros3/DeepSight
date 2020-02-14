@@ -241,6 +241,7 @@ namespace DeepSight {
                 m_ptPosHeight.GraphicDOFEnableBase = CogGraphicDOFConstants.All;
                 m_ptPosHeight.LineWidthInScreenPixels = 2;
                 m_ptPosHeight.Color = CogColorConstants.Red;
+                m_ptPosHeight.SelectedSpaceName = "@";
                 m_ptPosHeight.Changed += new CogChangedEventHandler(CallbackPosition);
 
                 // 검사 결과 업데이트 델리게이트
