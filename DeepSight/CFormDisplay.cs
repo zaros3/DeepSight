@@ -88,6 +88,11 @@ namespace DeepSight {
 
         public double dVidiFixedSizeWidthGradient;
         public double dVidiFixedSizeHeightGradient;
+
+        //Case - Measure 검사 결과 화면에 사용자가 원하는 위치의 높이 데이터 확인용
+        CogPointMarker m_ptPosHeight = new CogPointMarker();
+        double[] m_obj3DDataHeightCrop1d;
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //생성 : 
         //추가 : 
@@ -231,6 +236,12 @@ namespace DeepSight {
                     m_objLabelHistogram.Visible = false;
                     cogDisplay.InteractiveGraphics.Add( m_objLabelHistogram, "", false );
                 }
+
+                m_ptPosHeight.Interactive = true;
+                m_ptPosHeight.GraphicDOFEnableBase = CogGraphicDOFConstants.All;
+                m_ptPosHeight.LineWidthInScreenPixels = 2;
+                m_ptPosHeight.Color = CogColorConstants.Red;
+                m_ptPosHeight.Changed += new CogChangedEventHandler(CallbackPosition);
 
                 // 검사 결과 업데이트 델리게이트
                 m_objDelegateUpdateDisplayVIDI = new DelegateUpdateDisplay( UpdateDisplayVIDI );
@@ -1221,6 +1232,13 @@ namespace DeepSight {
                     objCogMinMaxAvg.SelectedSpaceName = "@";
                     objCogMinMaxAvg.SetXYText(0, 0, strMinMaxAvg);
                     AddStaticGraphic(objCogMinMaxAvg, "STATIC_HEIGHT_RESULT" );
+
+                    //사용자 지정 위치 데이터 출력 용 마지막 데이터 킵
+                    m_obj3DDataHeightCrop1d = objResult.objResultCommon.obj3DDataHeightCrop1d;
+                    cogDisplay.InteractiveGraphics.Remove("User Position");
+                    m_ptPosHeight.X = cogDisplay.Image.Width + 1;
+                    m_ptPosHeight.Y = cogDisplay.Image.Height + 1;
+                    cogDisplay.InteractiveGraphics.Add(m_ptPosHeight, "User Position", false);
 
                     // 샘플 높이데이터 표시
                     {
@@ -2523,6 +2541,23 @@ namespace DeepSight {
                 }
 
             } while( false );
+        }
+
+        public void CallbackPosition(object sender, CogChangedEventArgs e)
+        {
+            try
+            {
+                cogDisplay.StaticGraphics.Remove("User Position Height");
+
+                CogGraphicLabel coglbl = new CogGraphicLabel();
+                double dHeight = m_obj3DDataHeightCrop1d[Convert.ToInt32(m_ptPosHeight.X) + (Convert.ToInt32(m_ptPosHeight.Y) * cogDisplay.Image.Width)];
+                coglbl.SelectedSpaceName = "@";
+                coglbl.Color = CogColorConstants.Red;
+                coglbl.SetXYText(m_ptPosHeight.X, m_ptPosHeight.Y, dHeight.ToString("0.00"));
+
+                cogDisplay.StaticGraphics.Add(coglbl, "User Position Height");
+            }
+            catch { }
         }
     }
 }
