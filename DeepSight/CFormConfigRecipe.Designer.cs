@@ -208,6 +208,7 @@
             this.Text = "CFormConfigRecipe";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.CFormConfigRecipe_FormClosed);
             this.Load += new System.EventHandler(this.CFormConfigRecipe_Load);
+            this.VisibleChanged += new System.EventHandler(this.CFormConfigRecipe_VisibleChanged);
             ((System.ComponentModel.ISupportInitialize)(this.GridViewRecipeList)).EndInit();
             this.ResumeLayout(false);
 

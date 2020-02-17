@@ -91,7 +91,7 @@ namespace DeepSight {
 
         //Case - Measure 검사 결과 화면에 사용자가 원하는 위치의 높이 데이터 확인용
         CogPointMarker m_ptPosHeight = new CogPointMarker();
-        double[] m_obj3DDataHeightCrop1d;
+        double[,] m_obj3DDataHeightResult;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //생성 : 
@@ -1224,19 +1224,38 @@ namespace DeepSight {
                     objCogLabel.SetXYText( cogDisplay.Image.Width - dWhiteSpaceX, -dWhiteSpaceY, strResult );
                     AddStaticGraphic( objCogLabel, "STATIC_VIDI_RESULT" );
 
+                    //사용자 지정 위치 데이터 출력 용 마지막 데이터 킵
+                    m_obj3DDataHeightResult = objResult.objResultCommon.obj3DResultHeightData[m_iImageIndex];
+                    int nWidth = Convert.ToInt32(objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dEndX - objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dStartX);
+                    int nHeight = Convert.ToInt32(objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dEndY - objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dStartY);
+                    double[] dTemp = new double[nWidth * nHeight];
+                    try
+                    {
+                        for(int nY = 0; nY<nHeight; nY++)
+                        {
+                            for (int nX = 0; nX < nWidth; nX++)
+                            {
+                                dTemp[nY * nWidth + nX] = m_obj3DDataHeightResult[nY, nX];
+                            }
+                        }
+                    }
+                    catch { }
+
                     CogGraphicLabel objCogMinMaxAvg = new CogGraphicLabel();
                     objCogMinMaxAvg.Alignment = CogGraphicLabelAlignmentConstants.BottomLeft;
-                    string strMinMaxAvg = string.Format("Min:{0:2F}   Max:{1:2F}   Average:{2:2F}", objResult.objResultCommon.obj3DDataHeightCrop1d.Min()
-                                                                                                    , objResult.objResultCommon.obj3DDataHeightCrop1d.Max()
-                                                                                                    , objResult.objResultCommon.obj3DDataHeightCrop1d.Average());
+                    string strMinMaxAvg = string.Format("Min:{0:F2}   Max:{1:F2}   Average:{2:F2}", dTemp.Min()
+                                                                                                    , dTemp.Max()
+                                                                                                    , dTemp.Average());
                     objCogMinMaxAvg.Color = CogColorConstants.Yellow;
                     objCogMinMaxAvg.SelectedSpaceName = "@";
                     objCogMinMaxAvg.SetXYText(0, 0, strMinMaxAvg);
                     AddStaticGraphic(objCogMinMaxAvg, "STATIC_HEIGHT_RESULT" );
 
-                    //사용자 지정 위치 데이터 출력 용 마지막 데이터 킵
-                    m_obj3DDataHeightCrop1d = objResult.objResultCommon.obj3DDataHeightCrop1d;
-                    cogDisplay.InteractiveGraphics.Remove("User Position");
+                    try
+                    {
+                        cogDisplay.InteractiveGraphics.Remove("User Position");
+                    }
+                    catch { }
                     m_ptPosHeight.X = cogDisplay.Image.Width + 1;
                     m_ptPosHeight.Y = cogDisplay.Image.Height + 1;
                     cogDisplay.InteractiveGraphics.Add(m_ptPosHeight, "User Position", false);
@@ -2548,10 +2567,14 @@ namespace DeepSight {
         {
             try
             {
-                cogDisplay.StaticGraphics.Remove("User Position Height");
+                try
+                {
+                    cogDisplay.StaticGraphics.Remove("User Position Height");
+                }
+                catch { }
 
                 CogGraphicLabel coglbl = new CogGraphicLabel();
-                double dHeight = m_obj3DDataHeightCrop1d[Convert.ToInt32(m_ptPosHeight.X) + (Convert.ToInt32(m_ptPosHeight.Y) * cogDisplay.Image.Width)];
+                double dHeight = m_obj3DDataHeightResult[Convert.ToInt32(m_ptPosHeight.Y), Convert.ToInt32(m_ptPosHeight.X)];
                 coglbl.SelectedSpaceName = "@";
                 coglbl.Color = CogColorConstants.Red;
                 coglbl.SetXYText(m_ptPosHeight.X, m_ptPosHeight.Y, dHeight.ToString("0.00"));

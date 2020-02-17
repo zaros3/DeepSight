@@ -408,9 +408,10 @@ namespace DeepSight
 				pDocument.GetMainFrame().ShowWaitMessage( true, pDocument.GetDatabaseUserMessage( 10114 ) );
 
 				CConfig.CRecipeInformation objRecipeInformation = ( CConfig.CRecipeInformation )m_objRecipeInformationList[ m_iSelectedRow ].Clone();
-				objRecipeInformation.strRecipeName = BtnCreateName.Text;
+                objRecipeInformation.strRecipeName = GridViewRecipeList[(int)enumModelListColumn.NAME, m_iSelectedRow].Value.ToString();
+                //objRecipeInformation.strRecipeName = pDocument.m_objRecipe..Text;
                 // 레시피 파라미터 저장
-				pDocument.m_objConfig.SaveRecipeInformation( objRecipeInformation );
+                pDocument.m_objConfig.SaveRecipeInformation( objRecipeInformation );
                 // 레시피 파라미터 리스트 갱신
                 m_objRecipeInformationList = pDocument.m_objRecipe.GetRecipeInformationList();
                 //pDocument.m_objConfig.LoadModelParameter();
@@ -636,6 +637,11 @@ namespace DeepSight
             catch( Exception ex ) {
                 Trace.WriteLine( ex.Message );
             }
+        }
+
+        private void CFormConfigRecipe_VisibleChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
