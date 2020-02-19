@@ -35,6 +35,7 @@
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.BtnGuage = new System.Windows.Forms.Button();
             this.BtnHistogram = new System.Windows.Forms.Button();
+            this.BtnExpansion = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.cogDisplay)).BeginInit();
             this.SuspendLayout();
             // 
@@ -68,7 +69,7 @@
             this.BtnTitle.ForeColor = System.Drawing.Color.White;
             this.BtnTitle.Location = new System.Drawing.Point(1, 1);
             this.BtnTitle.Name = "BtnTitle";
-            this.BtnTitle.Size = new System.Drawing.Size(384, 46);
+            this.BtnTitle.Size = new System.Drawing.Size(320, 46);
             this.BtnTitle.TabIndex = 2;
             this.BtnTitle.TabStop = false;
             this.BtnTitle.Text = "???";
@@ -84,7 +85,7 @@
             this.BtnGuage.BackColor = System.Drawing.Color.DimGray;
             this.BtnGuage.Font = new System.Drawing.Font("맑은 고딕", 7F, System.Drawing.FontStyle.Bold);
             this.BtnGuage.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.BtnGuage.Location = new System.Drawing.Point(391, 1);
+            this.BtnGuage.Location = new System.Drawing.Point(398, 1);
             this.BtnGuage.Name = "BtnGuage";
             this.BtnGuage.Size = new System.Drawing.Size(69, 46);
             this.BtnGuage.TabIndex = 3;
@@ -107,11 +108,26 @@
             this.BtnHistogram.UseVisualStyleBackColor = false;
             this.BtnHistogram.Click += new System.EventHandler(this.BtnHistogram_Click);
             // 
+            // BtnExpansion
+            // 
+            this.BtnExpansion.BackColor = System.Drawing.Color.DimGray;
+            this.BtnExpansion.Font = new System.Drawing.Font("맑은 고딕", 7F, System.Drawing.FontStyle.Bold);
+            this.BtnExpansion.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.BtnExpansion.Location = new System.Drawing.Point(321, 1);
+            this.BtnExpansion.Name = "BtnExpansion";
+            this.BtnExpansion.Size = new System.Drawing.Size(78, 46);
+            this.BtnExpansion.TabIndex = 4;
+            this.BtnExpansion.TabStop = false;
+            this.BtnExpansion.Text = "EXPAND\r\n/UNDO";
+            this.BtnExpansion.UseVisualStyleBackColor = false;
+            this.BtnExpansion.Click += new System.EventHandler(this.BtnExpansion_Click);
+            // 
             // CFormDisplay
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(557, 428);
             this.ControlBox = false;
+            this.Controls.Add(this.BtnExpansion);
             this.Controls.Add(this.BtnHistogram);
             this.Controls.Add(this.BtnGuage);
             this.Controls.Add(this.BtnTitle);
@@ -136,5 +152,6 @@
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.Button BtnGuage;
         private System.Windows.Forms.Button BtnHistogram;
+        private System.Windows.Forms.Button BtnExpansion;
     }
 }

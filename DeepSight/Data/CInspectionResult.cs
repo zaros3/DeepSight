@@ -142,6 +142,10 @@ namespace DeepSight
             public double dPatternPositionX;
             public double dPatternPositionY;
 
+            //3D Measure 검사 영역 정보 수집용
+            public List<List<Rectangle>>    objMeasureAreaRect;
+            public List<List<double>>       objMeasureAreaValue;
+
             public void Init()
 			{
                 iInspectionPosition = 0;
@@ -177,6 +181,8 @@ namespace DeepSight
                 objVidiResultImage = new List<Cognex.VisionPro.CogImage8Grey>();
                 objVidiResultOverlayGraphic = new List<Cognex.VisionPro.CogImage8Grey>();
                 obj3DResultOverlayGraphic = new List<Cognex.VisionPro.CogImage8Grey>();
+                objMeasureAreaRect = new List<List<Rectangle>>();
+                objMeasureAreaValue = new List<List<double>>();
                 objVidiScore = new List<double>();
                 objVidiTactTime = new List<string>();
                 objMeasureTactTime = new List<string>();

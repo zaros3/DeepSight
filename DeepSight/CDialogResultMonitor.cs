@@ -92,7 +92,7 @@ namespace DeepSight
 
 
                         objForm.Initialize( ( int )CDefine.enumCamera.CAMERA_1, string.Format( "{0}", strDisplayName[ iLoopCount ] ), false, iImageIndex );
-                        objForm.SetDisplayIndex( iLoopCount );
+                        objForm.UseMeasureInfo3D();
 
                         objForm.Visible = true;
                         objForm.SetTimer( true );

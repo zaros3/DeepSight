@@ -96,6 +96,10 @@ namespace DeepSight {
             public double dScore;
             public string strTactTime;
 
+            //3D Measure Area Info
+            public List<Rectangle>  lstMeasureAreaRect;
+            public List<double>     lstMeasureAreaValue;
+
             public CVidiParameter()
             {
                 bBusy = false;
@@ -105,6 +109,8 @@ namespace DeepSight {
                 objInputImageBitmap = new Bitmap( 10, 10 );
                 objResultImage = new Bitmap( 10, 10 );
                 objResultOverlay = new Bitmap( 10, 10 );
+                lstMeasureAreaRect = new List<Rectangle>();
+                lstMeasureAreaValue = new List<double>();
                 strVidiStreamName = "";
                 strVidiToolName = "";
                 eVidiType = CDefine.enumVidiType.RED;
@@ -122,6 +128,8 @@ namespace DeepSight {
                 objInputImageBitmap = new Bitmap( 10, 10 );
                 objResultImage = new Bitmap( 10, 10 );
                 objResultOverlay = new Bitmap( 10, 10 );
+                lstMeasureAreaRect = new List<Rectangle>();
+                lstMeasureAreaValue = new List<double>();
                 strVidiStreamName = "";
                 strVidiToolName = "";
                 eVidiType = CDefine.enumVidiType.RED;
@@ -164,6 +172,10 @@ namespace DeepSight {
             public double dScore;
             public string strTactTime;
 
+            //3D Measure Area Info
+            public List<Rectangle> lstMeasureAreaRect;
+            public List<double> lstMeasureAreaValue;
+
             public CMeasureParameter()
             {
                 bBusy = false;
@@ -176,6 +188,8 @@ namespace DeepSight {
                 objInputImageBitmapSecond = new Bitmap( 10, 10 );
                 objResultImage = new Bitmap( 10, 10 );
                 objResultOverlay = new Bitmap( 10, 10 );
+                lstMeasureAreaRect = new List<Rectangle>();
+                lstMeasureAreaValue = new List<double>();
                 iHeightThresholdOverCount = 0;
                 dStartX = dStartY = dEndX = dEndY = dRotation = 0;
                 dGradientStartX = dGradientStartY = dGradientEndX = dGradientEndY = dGradientRotation = 0;
@@ -198,6 +212,8 @@ namespace DeepSight {
                 objInputImageBitmapSecond = new Bitmap( 10, 10 );
                 objResultImage = new Bitmap( 10, 10 );
                 objResultOverlay = new Bitmap( 10, 10 );
+                lstMeasureAreaRect = new List<Rectangle>();
+                lstMeasureAreaValue = new List<double>();
                 iHeightThresholdOverCount = 0;
                 dStartX = dStartY = dEndX = dEndY = dRotation = 0;
                 dGradientStartX = dGradientStartY = dGradientEndX = dGradientEndY = dGradientRotation = 0;
@@ -1046,7 +1062,9 @@ namespace DeepSight {
                     objResult.objResultCommon.obj3DListHeightOverBlobCountHigh.Add( m_objMeasureParameter[ iLoopCount ].iHeightLimitOverBlobCountHigh );
                     objResult.objResultCommon.obj3DListHeightOverBlobCountLow.Add( m_objMeasureParameter[ iLoopCount ].iHeightLimitOverBlobCountLow );
                     objResult.objResultCommon.obj3DListWeldWidth.Add( m_objMeasureParameter[ iLoopCount ].objLineData.dDistance );
-                    for( int iLoopSample = 0; iLoopSample < m_objMeasureParameter[ iLoopCount ].objListSampleHeightData.Count; iLoopSample++ )
+                    objResult.objResultCommon.objMeasureAreaRect.Add(m_objMeasureParameter[iLoopCount].lstMeasureAreaRect);
+                    objResult.objResultCommon.objMeasureAreaValue.Add(m_objMeasureParameter[iLoopCount].lstMeasureAreaValue);
+                    for ( int iLoopSample = 0; iLoopSample < m_objMeasureParameter[ iLoopCount ].objListSampleHeightData.Count; iLoopSample++ )
                         objResult.objResultCommon.obj3DListSampleHeightData[ iLoopCount ].Add( m_objMeasureParameter[ iLoopCount ].objListSampleHeightData[ iLoopSample ] );
                 }
 
@@ -1494,6 +1512,31 @@ namespace DeepSight {
                     m_objBlobHigh[ objParameter.iMeasureIndex ].Run();
                     m_objBlobLow[ objParameter.iMeasureIndex ].Run();
 
+                    //YJ - Area 출력용 수집
+                    CogRectangleAffine cogRect;
+                    if (m_objBlobHigh[objParameter.iMeasureIndex].Results != null)
+                        for (int i = 0; i < m_objBlobHigh[objParameter.iMeasureIndex].Results.GetBlobs().Count; i++)
+                        {
+                            cogRect = m_objBlobHigh[objParameter.iMeasureIndex].Results.GetBlobs()[i].GetBoundingBox(CogBlobAxisConstants.PixelAlignedNoExclude);
+                            objParameter.lstMeasureAreaRect.Add(new Rectangle(Convert.ToInt32(cogRect.CenterX - cogRect.SideXLength / 2)
+                                                        , Convert.ToInt32(cogRect.CenterY - cogRect.SideYLength / 2)
+                                                        , Convert.ToInt32(cogRect.SideXLength)
+                                                        , Convert.ToInt32(cogRect.SideYLength)
+                                ));
+                            objParameter.lstMeasureAreaValue.Add(m_objBlobHigh[objParameter.iMeasureIndex].Results.GetBlobs()[i].Area);
+                        }
+
+                    if (m_objBlobLow[objParameter.iMeasureIndex].Results != null)
+                        for (int i = 0; i < m_objBlobLow[objParameter.iMeasureIndex].Results.GetBlobs().Count; i++)
+                        {
+                            cogRect = m_objBlobLow[objParameter.iMeasureIndex].Results.GetBlobs()[i].GetBoundingBox(CogBlobAxisConstants.PixelAlignedNoExclude);
+                            objParameter.lstMeasureAreaRect.Add(new Rectangle(Convert.ToInt32(cogRect.CenterX - cogRect.SideXLength / 2)
+                                                        , Convert.ToInt32(cogRect.CenterY - cogRect.SideYLength / 2)
+                                                        , Convert.ToInt32(cogRect.SideXLength)
+                                                        , Convert.ToInt32(cogRect.SideYLength)
+                                ));
+                            objParameter.lstMeasureAreaValue.Add(m_objBlobLow[objParameter.iMeasureIndex].Results.GetBlobs()[i].Area);
+                        }
 
                     if ( null != m_objBlobHigh[ objParameter.iMeasureIndex ].Results && 0 < m_objBlobHigh[ objParameter.iMeasureIndex ].Results.GetBlobs().Count ) {
                         objParameter.iHeightLimitOverBlobCountHigh = m_objBlobHigh[ objParameter.iMeasureIndex ].Results.GetBlobs().Count;

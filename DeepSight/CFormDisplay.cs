@@ -10,6 +10,7 @@ using Cognex.VisionPro;
 using Cognex.VisionPro.Display;
 using Cognex.VisionPro.ImageFile;
 using Cognex.VisionPro.ImageProcessing;
+using System.Collections.Generic;
 
 namespace DeepSight {
     public partial class CFormDisplay : Form {
@@ -91,7 +92,12 @@ namespace DeepSight {
 
         //Case - Measure 검사 결과 화면에 사용자가 원하는 위치의 높이 데이터 확인용
         CogPointMarker m_ptPosHeight = new CogPointMarker();
+        CogGraphicLabel m_coglblHeight = new CogGraphicLabel();
+        CogGraphicLabel m_coglblToolTip = new CogGraphicLabel();
+        CogGraphicLabel m_coglblCogMinMaxAvg = new CogGraphicLabel();
         double[,] m_obj3DDataHeightResult;
+        List<Rectangle> m_lstMeasureAreaRect = null;
+        List<double> m_lstMeasureAreaValue = null;
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //생성 : 
@@ -237,12 +243,6 @@ namespace DeepSight {
                     cogDisplay.InteractiveGraphics.Add( m_objLabelHistogram, "", false );
                 }
 
-                m_ptPosHeight.Interactive = true;
-                m_ptPosHeight.GraphicDOFEnableBase = CogGraphicDOFConstants.All;
-                m_ptPosHeight.LineWidthInScreenPixels = 2;
-                m_ptPosHeight.Color = CogColorConstants.Red;
-                m_ptPosHeight.SelectedSpaceName = "@";
-                m_ptPosHeight.Changed += new CogChangedEventHandler(CallbackPosition);
 
                 // 검사 결과 업데이트 델리게이트
                 m_objDelegateUpdateDisplayVIDI = new DelegateUpdateDisplay( UpdateDisplayVIDI );
@@ -330,6 +330,48 @@ namespace DeepSight {
             cogDisplay = objCogDisplay as CogRecordDisplay;
         }
 
+        public void UseMeasureInfo3D()
+        {
+            m_ptPosHeight.LineWidthInScreenPixels = 3;
+            m_ptPosHeight.SelectedLineWidthInScreenPixels = 3;
+            m_ptPosHeight.Color = CogColorConstants.Yellow;
+            m_ptPosHeight.SelectedColor = CogColorConstants.Yellow;
+            m_ptPosHeight.GraphicDOFEnableBase = CogGraphicDOFConstants.All;
+            m_ptPosHeight.Interactive = true;
+            m_ptPosHeight.SelectedSpaceName = "@";
+            m_ptPosHeight.Changed += new CogChangedEventHandler(CallbackPosition);
+            m_ptPosHeight.Dragging += new CogDraggingEventHandler(CallbackDragging);
+            cogDisplay.InteractiveGraphics.Add(m_ptPosHeight, "User Position", false);
+
+
+            m_coglblToolTip.Alignment = CogGraphicLabelAlignmentConstants.TopLeft;
+            m_coglblToolTip.Color = CogColorConstants.White;
+            m_coglblToolTip.GraphicDOFEnableBase = CogGraphicDOFConstants.None;
+            m_coglblToolTip.Font = BtnTitle.Font;
+            m_coglblToolTip.Interactive = true;
+            m_coglblToolTip.SelectedSpaceName = "@";
+            m_coglblToolTip.Text = "";
+            cogDisplay.InteractiveGraphics.Add(m_coglblToolTip, "User Position Tool Tip", false);
+
+            m_coglblHeight.Color = CogColorConstants.Yellow;
+            m_coglblHeight.SelectedColor = CogColorConstants.Yellow;
+            m_coglblHeight.BackgroundColor = CogColorConstants.DarkGrey;
+            m_coglblHeight.GraphicDOFEnableBase = CogGraphicDOFConstants.None;
+            m_coglblHeight.Interactive = true;
+            m_coglblHeight.SelectedSpaceName = "@";
+            m_coglblHeight.Text = "";
+            cogDisplay.InteractiveGraphics.Add(m_coglblHeight, "User Position Height", false);
+
+
+            m_coglblCogMinMaxAvg.Alignment = CogGraphicLabelAlignmentConstants.BottomLeft;
+            m_coglblCogMinMaxAvg.Color = CogColorConstants.Yellow;
+            m_coglblCogMinMaxAvg.GraphicDOFEnableBase = CogGraphicDOFConstants.None;
+            m_coglblCogMinMaxAvg.Interactive = true;
+            m_coglblCogMinMaxAvg.SelectedSpaceName = "@";
+            m_coglblCogMinMaxAvg.Text = "";
+            cogDisplay.InteractiveGraphics.Add(m_coglblCogMinMaxAvg, "STATIC_HEIGHT_RESULT", false);
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //생성 : 
         //추가 : 
@@ -403,6 +445,7 @@ namespace DeepSight {
         {
             var pFormCommon = CFormCommon.GetFormCommon;
             // 버튼 Fore, Back 색상 정의
+            pFormCommon.SetButtonColor( this.BtnExpansion, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
             pFormCommon.SetButtonColor( this.BtnGuage, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
             pFormCommon.SetButtonColor( this.BtnHistogram, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
         }
@@ -1226,8 +1269,9 @@ namespace DeepSight {
 
                     //사용자 지정 위치 데이터 출력 용 마지막 데이터 킵
                     m_obj3DDataHeightResult = objResult.objResultCommon.obj3DResultHeightData[m_iImageIndex];
-                    int nWidth = Convert.ToInt32(objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dEndX - objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dStartX);
-                    int nHeight = Convert.ToInt32(objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dEndY - objResult.objResultCommon.obj3DRegionData[m_iImageIndex].dStartY);
+                    int nWidth = m_obj3DDataHeightResult.GetLength(1);
+                    int nHeight = m_obj3DDataHeightResult.GetLength(1);
+                    int iLength = m_obj3DDataHeightResult.Length;
                     double[] dTemp = new double[nWidth * nHeight];
                     try
                     {
@@ -1241,24 +1285,14 @@ namespace DeepSight {
                     }
                     catch { }
 
-                    CogGraphicLabel objCogMinMaxAvg = new CogGraphicLabel();
-                    objCogMinMaxAvg.Alignment = CogGraphicLabelAlignmentConstants.BottomLeft;
-                    string strMinMaxAvg = string.Format("Min:{0:F2}   Max:{1:F2}   Average:{2:F2}", dTemp.Min()
-                                                                                                    , dTemp.Max()
-                                                                                                    , dTemp.Average());
-                    objCogMinMaxAvg.Color = CogColorConstants.Yellow;
-                    objCogMinMaxAvg.SelectedSpaceName = "@";
-                    objCogMinMaxAvg.SetXYText(0, 0, strMinMaxAvg);
-                    AddStaticGraphic(objCogMinMaxAvg, "STATIC_HEIGHT_RESULT" );
+                    m_lstMeasureAreaRect = objResult.objResultCommon.objMeasureAreaRect[m_iImageIndex];
+                    m_lstMeasureAreaValue = objResult.objResultCommon.objMeasureAreaValue[m_iImageIndex];
 
-                    try
-                    {
-                        cogDisplay.InteractiveGraphics.Remove("User Position");
-                    }
-                    catch { }
-                    m_ptPosHeight.X = cogDisplay.Image.Width + 1;
-                    m_ptPosHeight.Y = cogDisplay.Image.Height + 1;
-                    cogDisplay.InteractiveGraphics.Add(m_ptPosHeight, "User Position", false);
+                    string strMinMaxAvg = string.Format("Min:{0:F3}   Max:{1:F3}   Average:{2:F3}", dTemp.Min(), dTemp.Max(), dTemp.Average());
+                    m_coglblCogMinMaxAvg.Text = strMinMaxAvg;   //Min Max Avragge 출력
+                    m_ptPosHeight.SetCenterRotationSize(180, cogDisplay.Image.Height + 50, 0, 10);  //사용자 지정 위치 컨트롤 초기화
+                    m_coglblHeight.Text = "";   //사용자 지정 위치 출력용 초기화
+                    m_coglblToolTip.SetXYText(m_ptPosHeight.X + 10, m_ptPosHeight.Y, "To see the height, drag this cross over the image."); //사용자 지정 위치 툴팁 출력
 
                     // 샘플 높이데이터 표시
                     {
@@ -1279,7 +1313,7 @@ namespace DeepSight {
                                 objHeightPoint.X = iLoopWidth;
                                 objHeightPoint.Y = iHeight / 2;
                                 if( iSample < objResult.objResultCommon.obj3DListSampleHeightData[ m_iImageIndex ].Count )
-                                    objHeightPoint.TipText = string.Format( "{0:F3}", objResult.objResultCommon.obj3DListSampleHeightData[ m_iImageIndex ][ iSample ] );
+                                    objHeightPoint.TipText = string.Format( "Height : {0:F3}", objResult.objResultCommon.obj3DListSampleHeightData[ m_iImageIndex ][ iSample ] );
                                 cogDisplay.InteractiveGraphics.Add( objHeightPoint, "CommonGraphics", false );
                                 iSample++;
                             }
@@ -1434,6 +1468,7 @@ namespace DeepSight {
                 m_bUseGuage = false;
                 m_objLabelGuage.Visible = false;
                 m_objRectangleGuage.Visible = false;
+                pFormCommon.SetButtonColor( this.BtnExpansion, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
                 pFormCommon.SetButtonColor( this.BtnGuage, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
                 pFormCommon.SetButtonColor( this.BtnHistogram, pFormCommon.COLOR_WHITE, pFormCommon.COLOR_UNACTIVATE );
             }
@@ -2111,7 +2146,9 @@ namespace DeepSight {
 
                 if( true == bUseHitogram ) {
                     // 타이틀은 게이지버튼 크기만큼 빼준다
-                    BtnTitle.Width = iWidth - BtnGuage.Width - BtnHistogram.Width;
+                    BtnTitle.Width = iWidth - BtnExpansion.Width - BtnGuage.Width - BtnHistogram.Width;
+                    // 화면 확장 버튼 위치
+                    BtnExpansion.Location = new Point(iWidth - BtnExpansion.Width - BtnGuage.Width - BtnHistogram.Width, 1);
                     // 게이지 버튼 위치
                     BtnGuage.Location = new Point( iWidth - BtnGuage.Width - BtnHistogram.Width, 1 );
                     // 메뉴얼 얼라인 버튼 위치
@@ -2125,6 +2162,9 @@ namespace DeepSight {
                     BtnTitle.Width = iWidth;// -BtnGuage.Width;
                     BtnHistogram.Visible = false;
                     BtnGuage.Visible = false;
+                    BtnExpansion.Visible = false;
+                    // 화면 확장 버튼 위치
+                    BtnExpansion.Location = new Point(iWidth - BtnExpansion.Width, 1);
                     // 게이지 버튼 위치
                     BtnGuage.Location = new Point( iWidth - BtnGuage.Width, 1 );
                     // 메뉴얼 얼라인 버튼 위치
@@ -2139,6 +2179,7 @@ namespace DeepSight {
                 this.Location = new Point( iPositionX, iPositionY );
                 this.Width = iWidth; this.Height = iHeight;
                 BtnTitle.Visible = false;
+                BtnExpansion.Visible = false;
                 BtnGuage.Visible = false;
                 BtnHistogram.Visible = false;
                 Point iPoint = new Point( 1, 1 );
@@ -2567,21 +2608,104 @@ namespace DeepSight {
         {
             try
             {
-                try
+                m_coglblToolTip.Text = "";
+                //try
+                //{
+                //    cogDisplay.StaticGraphics.Remove("User Position Height");
+                //}
+                //catch { }
+
+                //try
+                //{
+                //    cogDisplay.StaticGraphics.Remove("User Position Tool Tip");
+                //}
+                //catch { }
+                string strArea = "";
+                if(m_lstMeasureAreaRect != null)
                 {
-                    cogDisplay.StaticGraphics.Remove("User Position Height");
+                    for(int i=0; i< m_lstMeasureAreaRect.Count;i++)// Rectangle rect in m_lstMeasureAreaRect)
+                    {
+                        if (m_lstMeasureAreaRect[i].Contains(Convert.ToInt32(m_ptPosHeight.X), Convert.ToInt32(m_ptPosHeight.Y)))
+                        {
+                            strArea = " / Area : " + m_lstMeasureAreaValue[i].ToString("0");
+                            break;
+                        }
+                    }
                 }
-                catch { }
 
-                CogGraphicLabel coglbl = new CogGraphicLabel();
                 double dHeight = m_obj3DDataHeightResult[Convert.ToInt32(m_ptPosHeight.Y), Convert.ToInt32(m_ptPosHeight.X)];
-                coglbl.SelectedSpaceName = "@";
-                coglbl.Color = CogColorConstants.Red;
-                coglbl.SetXYText(m_ptPosHeight.X, m_ptPosHeight.Y, dHeight.ToString("0.00"));
+                double dPosX = (Convert.ToDouble(cogDisplay.Width) / Convert.ToDouble(m_obj3DDataHeightResult.GetLength(1))) * m_ptPosHeight.X;
+                if (cogDisplay.Width - 110 < dPosX)
+                {
+                    m_coglblHeight.Alignment = CogGraphicLabelAlignmentConstants.TopRight;
+                    m_coglblHeight.SetXYText(m_ptPosHeight.X - 1, m_ptPosHeight.Y + 1, "Height : " + dHeight.ToString("0.000") + strArea);
+                }
+                else
+                {
+                    m_coglblHeight.Alignment = CogGraphicLabelAlignmentConstants.TopLeft;
+                    m_coglblHeight.SetXYText(m_ptPosHeight.X + 1, m_ptPosHeight.Y + 1, "Height : " + dHeight.ToString("0.000") + strArea);
+                }
 
-                cogDisplay.StaticGraphics.Add(coglbl, "User Position Height");
+
+                //cogDisplay.StaticGraphics.Add(coglbl, "User Position Height");
             }
             catch { }
+        }
+        public void CallbackDragging(object sender, CogDraggingEventArgs e)
+        {
+            try
+            {
+                m_coglblToolTip.Text = "";
+                //try
+                //{
+                //   cogDisplay.StaticGraphics.Remove("User Position Height");
+                //}
+                //catch { }
+
+                //try
+                //{
+                //    cogDisplay.StaticGraphics.Remove("User Position Tool Tip");
+                //}
+                //catch { }
+                string strArea = "";
+                if (m_lstMeasureAreaRect != null)
+                {
+                    for (int i = 0; i < m_lstMeasureAreaRect.Count; i++)// Rectangle rect in m_lstMeasureAreaRect)
+                    {
+                        if (m_lstMeasureAreaRect[i].Contains(Convert.ToInt32(((CogPointMarker)e.DragGraphic).X), Convert.ToInt32(((CogPointMarker)e.DragGraphic).Y)))
+                        {
+                            strArea = " / Area : " + m_lstMeasureAreaValue[i].ToString("0");
+                            break;
+                        }
+                    }
+                }
+
+
+                double dHeight = m_obj3DDataHeightResult[Convert.ToInt32(((CogPointMarker)e.DragGraphic).Y), Convert.ToInt32(((CogPointMarker)e.DragGraphic).X)];
+                double dPosX = (Convert.ToDouble(cogDisplay.Width) / Convert.ToDouble(m_obj3DDataHeightResult.GetLength(1))) * ((CogPointMarker)e.DragGraphic).X;
+                if (cogDisplay.Width - 110 < dPosX)
+                {
+                    m_coglblHeight.Alignment = CogGraphicLabelAlignmentConstants.TopRight;
+                    m_coglblHeight.SetXYText(((CogPointMarker)e.DragGraphic).X - 1, ((CogPointMarker)e.DragGraphic).Y + 1, "Height : " + dHeight.ToString("0.000") + strArea);
+                }
+                else
+                {
+                    m_coglblHeight.Alignment = CogGraphicLabelAlignmentConstants.TopLeft;
+                    m_coglblHeight.SetXYText(((CogPointMarker)e.DragGraphic).X + 1, ((CogPointMarker)e.DragGraphic).Y + 1, "Height : " + dHeight.ToString("0.000") + strArea);
+                }
+
+                //cogDisplay.StaticGraphics.Add(coglbl, "User Position Height");
+            }
+            catch { }
+        }
+
+        private void BtnExpansion_Click(object sender, EventArgs e)
+        {
+            var pDocument = CDocument.GetDocument;
+            if (null != EventChangeSizeDisplay)
+            {
+                EventChangeSizeDisplay(m_iDisplayIndex);
+            }
         }
     }
 }
