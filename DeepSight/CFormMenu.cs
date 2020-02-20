@@ -225,8 +225,11 @@ namespace DeepSight
                 for( int iLoopMenu = 0; iLoopMenu < m_objMenu.Length; iLoopMenu++ ) {
                     // 현재 유저 권한 레벨이 폼 Read 레벨보다 낮으면 메뉴 버튼 막음
                     if( ( int )objUserInformation.m_eAuthorityLevel < ( int )pDocument.m_objAuthorityParameter.m_objLevelForm[ iLoopMenu ].eLevelRead ) {
+                        //Report는 살리자
+                        if (iLoopMenu == (int)CDefine.FormView.FORM_VIEW_REPORT)
+                            continue;
                         // 버튼 Disable 상태 아니면 Disable로 변경
-                        if( true == m_objMenu[ iLoopMenu ].Enabled ) {
+                        if ( true == m_objMenu[ iLoopMenu ].Enabled ) {
                             m_objMenu[ iLoopMenu ].Enabled = false;
                         }
                     }
@@ -239,9 +242,9 @@ namespace DeepSight
                     }
                 }
             } else {
-                for( int iLoopMenu = 0; iLoopMenu < m_objMenu.Length; iLoopMenu++ ) {
+                for( int iLoopMenu = 0; iLoopMenu < m_objMenu.Length-1; iLoopMenu++ ) {
                     // 버튼 Enable 상태 아니면 Enable로 변경
-                    if( ( int )CDefine.FormView.FORM_VIEW_MAIN != iLoopMenu ) {
+                    if( ( int )CDefine.FormView.FORM_VIEW_MAIN != iLoopMenu) {
                         if( true == m_objMenu[ iLoopMenu ].Enabled ) {
                             m_objMenu[ iLoopMenu ].Enabled = false;
                         }
